@@ -18,6 +18,10 @@ int main(){
     /* Create the listen socket. This is a TCP socket, so use SOCK_STREAM 
      * Exit if the socket cannot be created */
     sock = socket(AF_INET, SOCK_STREAM, 0);
+    //set socket option
+    int val = 1;
+    setsockopt(sock, SOL_SOCKET, TCP_NODELAY, &val,sizeof(val));
+    
     if (sock < 0) 
     {
         perror("receiver: socket() failed. ");
@@ -89,12 +93,13 @@ int main(){
         //char responde200[] = "HTTP/1.0 200 OK\nDate: Fri, 31 Dec 1999 23:59:59 GMT\nContent-Type: text/html\nContent-Length: 1354\n\n<html>\n<body>\n<h1>Happy New Millennium!</h1>\n(more file contents)\n . \n . \n .\n</body>\n</html>";
         char body[] = "<html>\n<body>\n<h1>Happy New Millennium!</h1>\n(more file contents)\n . \n . \n .\n</body>\n</html>";
         int bodysize = sizeof(body);
-        char header[] = "HTTP/1.0 200 OK\nDate: Fri, 31 Dec 1999 23:59:59 GMT\nContent-Type: text/html\nContent-Length: ";
-        snprintf(response,sizeof(response),"%s%d\n\n%s",header,bodysize,body);
+        char header[] = "HTTP/1.1 200 OK\r\nDate: Fri, 31 Dec 1999 23:59:59 GMT\r\nContent-Type: text/html\r\nContent-Length: ";
+        snprintf(response,sizeof(response),"%s%d\r\n\r\n%s",header,strlen(body),body);
         //send
-        //send(msgsock, response, sizeof(body)+sizeof(header)+1,0);
-        char okresponse[] = "HTTP/1.0 200 OK\n\n";
-        send(msgsock,okresponse,sizeof(okresponse)+1,0);
+        send(msgsock, response, sizeof(body)+sizeof(header),0);
+        //char okresponse[] = "HTTP/1.0 200 OK\n\n";
+        //send(msgsock,okresponse,sizeof(okresponse)+1,0);
+        shutdown(msgsock, SHUT_RDWR);
         close(msgsock);
     }  
     return 0;
