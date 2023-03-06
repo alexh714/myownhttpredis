@@ -3,6 +3,8 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <sys/time.h>
 #include <unistd.h>      // for gethostname() 
 #include <arpa/inet.h>   // for IP address structures and functions 
